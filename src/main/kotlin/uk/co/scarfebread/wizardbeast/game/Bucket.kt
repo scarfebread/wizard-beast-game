@@ -1,4 +1,4 @@
-package game
+package uk.co.scarfebread.wizardbeast.game
 
 import com.badlogic.gdx.math.Rectangle
 

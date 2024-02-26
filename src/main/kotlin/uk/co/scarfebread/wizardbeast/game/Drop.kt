@@ -1,4 +1,4 @@
-package game
+package uk.co.scarfebread.wizardbeast.game
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import model.User
-import online.BackendClient
+import uk.co.scarfebread.wizardbeast.model.Player
+import uk.co.scarfebread.wizardbeast.state.BackendClient
 
 class Drop(private val client: BackendClient, private val playerId: String, private val buckets: List<Rectangle>) : ApplicationAdapter() {
     private var dropImage: Texture? = null
@@ -107,8 +107,8 @@ class Drop(private val client: BackendClient, private val playerId: String, priv
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             bucket.x -= 200 * Gdx.graphics.deltaTime
             launch {
-                client.updateUser(
-                    User(
+                client.movePlayer(
+                    Player(
                         id = playerId,
                         position = bucket.x
                     )
@@ -118,8 +118,8 @@ class Drop(private val client: BackendClient, private val playerId: String, priv
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             bucket.x += 200 * Gdx.graphics.deltaTime
             launch {
-                client.updateUser(
-                    User(
+                client.movePlayer(
+                    Player(
                         id = playerId,
                         position = bucket.x
                     )

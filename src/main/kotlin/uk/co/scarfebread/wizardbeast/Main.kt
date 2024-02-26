@@ -1,26 +1,29 @@
+package uk.co.scarfebread.wizardbeast
+
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import game.Bucket
-import game.Drop
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
+import uk.co.scarfebread.wizardbeast.game.Bucket
+import uk.co.scarfebread.wizardbeast.game.Drop
+import io.ktor.network.selector.SelectorManager
+import io.ktor.network.sockets.InetSocketAddress
+import io.ktor.network.sockets.aSocket
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import online.BackendClient
-import online.OnlineManager
+import uk.co.scarfebread.wizardbeast.state.BackendClient
+import uk.co.scarfebread.wizardbeast.client.OnlineManager
 import java.util.*
 
 fun main(args: Array<String>) {
     runBlocking {
+        val server = InetSocketAddress("127.0.0.1", 9002)
         val client = BackendClient(
-            HttpClient(CIO) {
-                install(ContentNegotiation) {
-                    json()
-                }
-            }
+            aSocket(SelectorManager(Dispatchers.IO))
+                .udp()
+                .bind(InetSocketAddress("127.0.0.1", 9003)),
+            server
         )
+
         val onlineManager = OnlineManager(client)
         val buckets = mutableListOf<Bucket>()
         val playerId = UUID.randomUUID().toString()
