@@ -28,13 +28,11 @@ fun main() =  runBlocking {
         gameStateManager
     )
 
-    val playerName = UUID.randomUUID().toString()
-
     launch(Dispatchers.IO) {
         client.listen()
     }
 
-    val game = WizardBeast(client, playerName, gameStateManager.players(), client, gameStateManager)
+    val game = WizardBeast(gameStateManager.players(), client, gameStateManager)
 
     runCatching {
         Lwjgl3Application(game, Lwjgl3ApplicationConfiguration().apply {

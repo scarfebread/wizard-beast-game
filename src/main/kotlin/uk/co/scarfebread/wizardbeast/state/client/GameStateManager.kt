@@ -16,6 +16,7 @@ class GameStateManager {
 
     fun players() = players.toList()
 
+    // TODO client side buffering
     fun processServerState(publishableState: PublishableState) {
         player.x = publishableState.player.x
         player.y = publishableState.player.y

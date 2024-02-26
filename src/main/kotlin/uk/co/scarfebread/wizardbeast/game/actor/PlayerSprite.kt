@@ -26,10 +26,6 @@ class PlayerSprite(
             25f
         )
 
-        launch(Dispatchers.IO) {
-            // TODO this should be done on movement not on draw
-            publish()
-        }
         animate()
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) { left() }
@@ -59,11 +55,11 @@ class PlayerSprite(
 //            println("player does not match the server")
 //        }
 
-        if (x != player.x && y != player.y) {
-            println("forcing player position")
-            x = player.x
-            y = player.y
-        }
+//        if (x != player.x && y != player.y) {
+//            println("forcing player position")
+//            x = player.x
+//            y = player.y
+//        }
     }
 
     companion object {

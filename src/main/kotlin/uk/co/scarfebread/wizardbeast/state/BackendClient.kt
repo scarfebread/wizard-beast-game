@@ -5,9 +5,11 @@ import io.ktor.network.sockets.Datagram
 import io.ktor.network.sockets.InetSocketAddress
 import io.ktor.utils.io.core.ByteReadPacket
 import io.ktor.utils.io.core.readUTF8Line
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import uk.co.scarfebread.wizardbeast.model.Player
 import uk.co.scarfebread.wizardbeast.model.request.AcknowledgeRequest
 import uk.co.scarfebread.wizardbeast.model.request.DeregisterRequest
 import uk.co.scarfebread.wizardbeast.model.request.PlayerActionRequest
@@ -45,14 +47,15 @@ class BackendClient(
 
             when(eventType) {
                 "state" -> {
-                    gameStateManager.processServerState(
-                        payload.deserialise<PublishableState>().also {
-                            acknowledge(it.player.id, it.stateId, requestId)
-                        }
-                    )
+                    withLag {
+                        gameStateManager.processServerState(
+                            payload.deserialise<PublishableState>().also {
+                                acknowledge(it.player.id, it.stateId, requestId)
+                            }
+                        )
+                    }
                 }
                 "registered" -> {
-                    println("registered")
                     registrations[requestId]?.invoke(payload.deserialise<PlayerState>())
                 }
                 "invalid" -> {
@@ -97,19 +100,22 @@ class BackendClient(
         }
     }
 
-    fun deletePlayer(player: String) {
-        runBlocking {
-            clientSocket.send(
-                Datagram(
-                    ByteReadPacket(
-                        DeregisterRequest(player)
-                            .toJson(json)
-                            .encodeToByteArray()
-                    ),
-                    server
-                )
+    fun deregisterPlayer(player: String) = runBlocking {
+        clientSocket.send(
+            Datagram(
+                ByteReadPacket(
+                    DeregisterRequest(player)
+                        .toJson(json)
+                        .toRequest("deregister", requestId())
+                        .encodeToByteArray()
+                ),
+                server
             )
-        }
+        )
+    }
+
+    fun close() {
+        clientSocket.close()
     }
 
     private fun acknowledge(player: String, stateId: Long, requestId: String) {
@@ -147,4 +153,11 @@ class BackendClient(
     private fun List<String>.second() = this[1]
 
     private fun String.toRequest(event: String, requestId: String) = "$event--$this--$requestId"
+
+    private fun withLag(process: () -> Unit) = runBlocking {
+        launch(Dispatchers.IO) {
+            delay(100)
+            process()
+        }
+    }
 }

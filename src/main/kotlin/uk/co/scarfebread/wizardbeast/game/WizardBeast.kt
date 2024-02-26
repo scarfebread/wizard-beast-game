@@ -2,16 +2,12 @@ package uk.co.scarfebread.wizardbeast.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
-import kotlinx.coroutines.runBlocking
 import uk.co.scarfebread.wizardbeast.state.BackendClient
 import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
 import uk.co.scarfebread.wizardbeast.state.publishable.PlayerState
 
 class WizardBeast(
-    private val client: BackendClient,
-    private val playerId: String,
     private val players: List<PlayerState>,
     private val backendClient: BackendClient,
     private val gameStateManager: GameStateManager
@@ -34,5 +30,10 @@ class WizardBeast(
         screen.dispose()
         font.dispose()
         stage.dispose()
+
+        backendClient.deregisterPlayer(
+            gameStateManager.player.id
+        )
+        backendClient.close()
     }
 }
