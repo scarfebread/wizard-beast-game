@@ -15,7 +15,7 @@ class PlayerSprite(
     private val backendClient: BackendClient,
     private val player: Player,
     private var x: Float,
-    private var y: Float
+    private var y: Float,
 ) : Actor() {
     override fun draw(batch: Batch, parentAlpha: Float) = runBlocking {
         batch.draw(
@@ -49,20 +49,19 @@ class PlayerSprite(
     }
 
     private fun animate() {
-//        if (x == player.x && y == player.y) {
-//            println("player matches server")
-//        } else {
-//            println("player does not match the server")
-//        }
-
-//        if (x != player.x && y != player.y) {
-//            println("forcing player position")
-//            x = player.x
-//            y = player.y
-//        }
+        if (!x.withinReasonableDistanceOf(player.x) || !y.withinReasonableDistanceOf(player.y)) {
+            println("forcing player position")
+            x = player.x
+            y = player.y
+        }
     }
+
+    private fun Float.withinReasonableDistanceOf(otherPosition: Float) =
+        this < otherPosition + REASONABLE_DISTANCE &&
+        this > otherPosition - REASONABLE_DISTANCE
 
     companion object {
         private const val SPEED = 3f
+        private const val REASONABLE_DISTANCE = 50f
     }
 }

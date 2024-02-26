@@ -5,7 +5,9 @@ import io.ktor.network.sockets.Datagram
 import io.ktor.network.sockets.InetSocketAddress
 import io.ktor.utils.io.core.ByteReadPacket
 import io.ktor.utils.io.core.readUTF8Line
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -43,7 +45,8 @@ class BackendClient(
             val payload = split.second()
             val requestId = split.last()
 
-            if (eventType != "state") println(message)
+//            if (eventType != "state")
+                println(message)
 
             when(eventType) {
                 "state" -> {
@@ -154,8 +157,9 @@ class BackendClient(
 
     private fun String.toRequest(event: String, requestId: String) = "$event--$this--$requestId"
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun withLag(process: () -> Unit) = runBlocking {
-        launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             delay(100)
             process()
         }
