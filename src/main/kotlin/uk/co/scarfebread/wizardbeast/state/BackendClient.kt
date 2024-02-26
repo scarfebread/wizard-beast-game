@@ -41,6 +41,8 @@ class BackendClient(
             val payload = split.second()
             val requestId = split.last()
 
+            if (eventType != "state") println(message)
+
             when(eventType) {
                 "state" -> {
                     gameStateManager.processServerState(
@@ -50,6 +52,7 @@ class BackendClient(
                     )
                 }
                 "registered" -> {
+                    println("registered")
                     registrations[requestId]?.invoke(payload.deserialise<PlayerState>())
                 }
                 "invalid" -> {

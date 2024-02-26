@@ -32,7 +32,7 @@ class GameScreen(
         stage.addActor(playerSprite)
     }
 
-    override fun render(delta: Float) = runBlocking {
+    override fun render(delta: Float) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         ScreenUtils.clear(0f, 0f, 0.2f, 1f)
@@ -41,10 +41,6 @@ class GameScreen(
 
         stage.act(delta)
         stage.draw()
-
-        launch(Dispatchers.IO) {
-            playerSprite.publish()
-        }
 
         Gdx.input.inputProcessor = stage
     }
