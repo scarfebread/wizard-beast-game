@@ -29,7 +29,7 @@ class BackendClient(
         while (true) {
             val datagram = clientSocket.receive()
             val message = datagram.packet.readUTF8Line() ?: continue
-            val split = message.split("-", limit = 3)
+            val split = message.split("--", limit = 3)
 
             if (split.size != 3) {
                 println("[WARN] Invalid request: $message")
@@ -37,8 +37,8 @@ class BackendClient(
             }
 
             val eventType = split.first()
-            val requestId = split.second()
-            val payload = split.last()
+            val payload = split.second()
+            val requestId = split.last()
 
             when(eventType) {
                 "state" -> {
@@ -54,19 +54,18 @@ class BackendClient(
         }
     }
 
-    fun registerPlayer(playerName: String) {
+    fun registerPlayer(playerName: String, callback: (playerState: PlayerState) -> Unit) {
         val requestId = requestId()
 
-        registrations[requestId] = {
-            gameStateManager.playerRegistered(it)
-        }
+        registrations[requestId] = { callback(it) }
 
         runBlocking {
             clientSocket.send(
                 Datagram(
                     ByteReadPacket(
-                        RegisterRequest(requestId, playerName)
+                        RegisterRequest(playerName)
                             .toJson(json)
+                            .toRequest("register", requestId)
                             .encodeToByteArray()
                     ),
                     server
@@ -118,5 +117,7 @@ class BackendClient(
 
     private fun requestId() = UUID.randomUUID().toString()
 
-    private fun List<Any>.second() = this[1]
+    private fun List<String>.second() = this[1]
+
+    private fun String.toRequest(event: String, requestId: String) = "$event--$this--$requestId"
 }

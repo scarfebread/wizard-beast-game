@@ -12,10 +12,13 @@ class GameStateManager {
     private val players = mutableListOf<PlayerState>()
     private val enemies = mutableListOf<String>()
     private val projectiles = mutableListOf<String>()
+
+    fun players() = players.toList()
+
     fun processServerState(publishableState: PublishableState) {
         publishableState.players.forEach { action ->
             when (action) {
-                is ConnectAction -> players.add(PlayerState(action.name, action.x, action.y))
+                is ConnectAction -> players.add(PlayerState(action.id, action.name, action.x, action.y))
                 is DisconnectAction -> players.removeAll { it.name == action.name } // TODO should be ID
                 is MoveAction -> {
                     players.first { it.name == action.name }.apply {
@@ -27,8 +30,7 @@ class GameStateManager {
         }
     }
 
-    fun playerRegistered(player: PlayerState) {
-//        player = Player(
-//        )
+    fun playerRegistered(playerState: PlayerState) {
+        player = playerState.toPlayer()
     }
 }

@@ -2,45 +2,51 @@ package uk.co.scarfebread.wizardbeast
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
-import uk.co.scarfebread.wizardbeast.game.Bucket
-import uk.co.scarfebread.wizardbeast.game.Drop
+import uk.co.scarfebread.wizardbeast.game.WizardBeast
 import io.ktor.network.selector.SelectorManager
 import io.ktor.network.sockets.InetSocketAddress
 import io.ktor.network.sockets.aSocket
+import io.ktor.utils.io.printStack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import uk.co.scarfebread.wizardbeast.game.MainMenu
 import uk.co.scarfebread.wizardbeast.state.BackendClient
-import uk.co.scarfebread.wizardbeast.client.OnlineManager
+import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
 import java.util.*
 
-fun main(args: Array<String>) {
-    runBlocking {
-        val server = InetSocketAddress("127.0.0.1", 9002)
-        val client = BackendClient(
-            aSocket(SelectorManager(Dispatchers.IO))
-                .udp()
-                .bind(InetSocketAddress("127.0.0.1", 9003)),
-            server
-        )
+fun main() =  runBlocking {
+    val gameStateManager = GameStateManager()
 
-        val onlineManager = OnlineManager(client)
-        val buckets = mutableListOf<Bucket>()
-        val playerId = UUID.randomUUID().toString()
+    val server = InetSocketAddress("127.0.0.1", 9002)
 
-        launch {
-            onlineManager.updatePlayers(buckets, playerId)
-        }
+    val client = BackendClient(
+        aSocket(SelectorManager(Dispatchers.IO))
+            .udp()
+            .bind(InetSocketAddress("127.0.0.1", 9003)),
+        server,
+        gameStateManager
+    )
 
-//        Runtime.getRuntime().addShutdownHook(Thread({ client.deleteUser(playerId) }, "Shutdown-thread"))
+    val playerName = UUID.randomUUID().toString()
 
-        val game = Drop(client, playerId, buckets)
+    launch(Dispatchers.IO) {
+        client.listen()
+    }
 
+    val game = WizardBeast(client, playerName, gameStateManager.players(), client, gameStateManager)
+
+    runCatching {
         Lwjgl3Application(game, Lwjgl3ApplicationConfiguration().apply {
-            setTitle("Drop")
+            setTitle("Wizard Beast")
             setWindowedMode(800, 480)
             useVsync(true)
             setForegroundFPS(60)
         })
+    }.onFailure {
+        println(it.message)
+        it.printStackTrace()
     }
+
+    println("bye")
 }

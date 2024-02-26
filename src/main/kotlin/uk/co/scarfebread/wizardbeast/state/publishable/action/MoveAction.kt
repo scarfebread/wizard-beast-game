@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MoveAction(
     val name: String,
-    val x: Int,
-    val y: Int,
+    val x: Float,
+    val y: Float,
     val action: String = "move",
 ) : PlayerAction

@@ -4,8 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ConnectAction(
+    val id: String,
     val name: String,
-    val x: Int,
-    val y: Int,
+    val x: Float,
+    val y: Float,
     val action: String = "connect",
 ) : PlayerAction
