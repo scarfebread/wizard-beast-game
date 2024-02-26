@@ -83,13 +83,12 @@ class GameStateManager {
                         action.y
                     )
                 )
-                is DisconnectAction -> {
-                    println("DisconnectAction")
-                    players.firstOrNull { it.name == action.name }?.let { // TODO should be ID
+                is DisconnectAction -> players
+                    .firstOrNull { it.player.id == action.player }
+                    ?.let {
                         it.disconnected = true
                         players.remove(it)
                     }
-                }
                 is MoveAction -> players.first { it.player.id == action.player }.apply {
                     predictMovement(movementWeighting, action.x, action.y)
                 }

@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DisconnectAction(
-    val name: String,
+    val player: String,
     val action: String = "disconnect",
 ) : PlayerAction
