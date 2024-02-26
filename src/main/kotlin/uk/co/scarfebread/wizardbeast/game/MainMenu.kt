@@ -48,13 +48,13 @@ class MainMenu(
         ScreenUtils.clear(0f, 0f, 0.2f, 1f)
 
         camera.update();
-        game.batch.projectionMatrix = camera.combined;
 
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        game.stage.act(Gdx.graphics.deltaTime);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        game.stage.act(delta)
         game.stage.draw()
-        game.stage.act()
-        Gdx.input.inputProcessor = game.stage;
+
+        Gdx.input.inputProcessor = game.stage
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             usernameTextField.text.let { username ->
@@ -67,13 +67,14 @@ class MainMenu(
                     usernameError.remove()
 
                     backendClient.registerPlayer(username) {
-                        println("registered")
                         runCatching {
                             gameStateManager.playerRegistered(it)
-                            game.screen = GameScreen(game)
+                            game.screen = GameScreen(game, gameStateManager)
                             dispose()
                         }.onFailure {
-                            println("??? ${it.message}")
+                            usernameError.setText(it.message)
+                            game.stage.addActor(usernameError)
+                            submitted = false
                         }
                     }
                 }

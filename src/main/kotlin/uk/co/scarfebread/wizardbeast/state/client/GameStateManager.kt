@@ -8,7 +8,8 @@ import uk.co.scarfebread.wizardbeast.state.publishable.action.DisconnectAction
 import uk.co.scarfebread.wizardbeast.state.publishable.action.MoveAction
 
 class GameStateManager {
-    private lateinit var player: Player
+//    lateinit var player: Player
+    var player = Player("", "", 100f, 100f)
     private val players = mutableListOf<PlayerState>()
     private val enemies = mutableListOf<String>()
     private val projectiles = mutableListOf<String>()

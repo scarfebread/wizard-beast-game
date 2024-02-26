@@ -16,21 +16,25 @@ class WizardBeast(
     private val backendClient: BackendClient,
     private val gameStateManager: GameStateManager
 ) : Game() {
-    lateinit var batch: SpriteBatch
     lateinit var stage: Stage
     lateinit var font: BitmapFont
+    private val registrationEnabled = false
 
     override fun create() {
-        batch = SpriteBatch()
         font = BitmapFont()
         stage = Stage()
-        this.setScreen(MainMenu(this, backendClient, gameStateManager))
+        if (registrationEnabled) {
+            this.setScreen(MainMenu(this, backendClient, gameStateManager))
+        } else {
+            this.setScreen(GameScreen(this, gameStateManager))
+        }
     }
 
     override fun dispose() {
         getScreen().dispose()
 
-        batch.dispose()
         font.dispose()
+
+        stage.dispose()
     }
 }
