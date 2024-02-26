@@ -91,15 +91,17 @@ class BackendClient(
         }
     }
 
-    fun movePlayer(player: String, x: Float, y: Float) {
+    fun registerInput(player: String, actions: Map<Int, Boolean>) {
         runBlocking {
             clientSocket.send(
                 createActionDataGram(
                     player,
-                    listOf(
-                        Action("x", x.toString()),
-                        Action("y", y.toString()),
-                    ),
+                    actions.map {
+                        Action(
+                            it.key,
+                            it.value
+                        )
+                    },
                     requestId()
                 )
             )

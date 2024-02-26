@@ -53,7 +53,7 @@ class GameStateManager {
             val distanceToPreviousState = stateId - lastStateProcessed
             val distanceToNextState = nextStateId - stateId
             val range = distanceToPreviousState + distanceToNextState
-            val movementWeighting = distanceToPreviousState / range
+            val movementWeighting = distanceToPreviousState / range // TODO this can be zero
 
             // we do not assign lastStateProcessed as it's a prediction
             // and if we receive the actual state we want to re-run this code

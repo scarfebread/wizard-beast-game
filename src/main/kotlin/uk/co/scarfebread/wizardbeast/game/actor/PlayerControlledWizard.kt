@@ -1,22 +1,24 @@
 package uk.co.scarfebread.wizardbeast.game.actor
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import uk.co.scarfebread.wizardbeast.model.Player
-import uk.co.scarfebread.wizardbeast.state.BackendClient
 
 class PlayerControlledWizard(
-    private val backendClient: BackendClient,
-    private val player: Player,
+    val player: Player,
     private var x: Float,
     private var y: Float,
 ) : WizardSprite() {
+    var movingRight = false
+    var movingLeft = false
+    var movingUp = false
+    var movingDown = false
+
     override fun draw(batch: Batch, parentAlpha: Float) = runBlocking {
+        animate()
+
         batch.draw(
             Texture(texture),
             x,
@@ -24,30 +26,14 @@ class PlayerControlledWizard(
             SIZE,
             SIZE
         )
-
-        animate()
-
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) { left() }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) { right() }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) { up() }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) { down() }
-    }
-
-    private fun up() { y += SPEED; publish() }
-    private fun down() { y -= SPEED; publish() }
-    private fun left() { x -= SPEED; publish() }
-    private fun right() { x += SPEED; publish() }
-
-    private fun publish() = runBlocking {
-        // TODO I should only send 64 times a second
-        if (x != player.x || y != player.y) {
-            launch(Dispatchers.IO) {
-                backendClient.movePlayer(player.id, x, y)
-            }
-        }
     }
 
     private fun animate() {
+        if (movingRight) { x += SPEED * Gdx.graphics.deltaTime }
+        if (movingLeft) { x -= SPEED * Gdx.graphics.deltaTime }
+        if (movingUp) { y += SPEED * Gdx.graphics.deltaTime }
+        if (movingDown) { y -= SPEED * Gdx.graphics.deltaTime }
+
         if (!x.withinReasonableDistanceOf(player.x) || !y.withinReasonableDistanceOf(player.y)) {
             println("forcing player position")
             x = player.x
@@ -60,7 +46,7 @@ class PlayerControlledWizard(
         this > otherPosition - REASONABLE_DISTANCE
 
     companion object {
-        private const val SPEED = 3f
+        private const val SPEED = 100f
         private const val REASONABLE_DISTANCE = 50f
     }
 }
