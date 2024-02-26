@@ -2,37 +2,42 @@ package uk.co.scarfebread.wizardbeast.game.actor
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.Input
+import uk.co.scarfebread.wizardbeast.model.Location
 import uk.co.scarfebread.wizardbeast.state.publishable.PlayerState
 
 class ServerControlledWizard(
-    val player: PlayerState,
-    private var x: Float,
-    private var y: Float,
+    player: PlayerState,
+    x: Float,
+    y: Float,
     private var previousX: Float = x,
     private var previousY: Float = y,
     var connected: Boolean = true,
     var disconnected: Boolean = false,
-) : WizardSprite() {
+) : WizardSprite(player.toPlayer(), Location(x, y)) {
     override fun draw(batch: Batch, parentAlpha: Float) {
         if (disconnected) {
             remove()
             return
         }
 
+        animate()
+
         batch.draw(
             Texture(texture),
-            x,
-            y,
+            location.x,
+            location.y,
             SIZE,
             SIZE
         )
     }
 
-    fun predictMovement(movementWeighting: Long, x: Float, y: Float) {
-        previousX = this.x
-        previousY = this.y
-        this.x = move(movementWeighting, this.x, x)
-        this.y = move(movementWeighting, this.y, y)
+    fun predictMovement(movementWeighting: Long, x: Float, y: Float, input: Input) {
+        previousX = location.x
+        previousY = location.y
+        player.x = move(movementWeighting, location.x, x)
+        player.y = move(movementWeighting, location.y, y)
+        this.setInput(input)
     }
 
     private fun move(movementWeighting: Long, oldLocation: Float, newLocation: Float): Float {

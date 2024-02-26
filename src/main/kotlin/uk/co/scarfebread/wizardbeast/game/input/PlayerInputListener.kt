@@ -10,13 +10,11 @@ class PlayerInputListener(private val wizard: PlayerControlledWizard) : InputLis
 
     override fun keyDown(event: InputEvent, keycode: Int): Boolean {
         processKeyAction(keycode, true)
-
         return true
     }
 
     override fun keyUp(event: InputEvent, keycode: Int): Boolean {
         processKeyAction(keycode, false)
-
         return true
     }
 
@@ -25,19 +23,19 @@ class PlayerInputListener(private val wizard: PlayerControlledWizard) : InputLis
 
         when(keycode) {
             Input.Keys.LEFT -> {
-                wizard.movingLeft = currentlyPressed
+                wizard.input.left = currentlyPressed
                 actions[keycode] = currentlyPressed
             }
             Input.Keys.RIGHT -> {
-                wizard.movingRight = currentlyPressed
+                wizard.input.right = currentlyPressed
                 actions[keycode] = currentlyPressed
             }
             Input.Keys.UP -> {
-                wizard.movingUp = currentlyPressed
+                wizard.input.up = currentlyPressed
                 actions[keycode] = currentlyPressed
             }
             Input.Keys.DOWN -> {
-                wizard.movingDown = currentlyPressed
+                wizard.input.down = currentlyPressed
                 actions[keycode] = currentlyPressed
             }
         }

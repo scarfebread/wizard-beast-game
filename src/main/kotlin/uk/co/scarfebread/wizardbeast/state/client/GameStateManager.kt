@@ -79,7 +79,9 @@ class GameStateManager {
                         ServerControlledWizard(
                             PlayerState(
                                 action.id,
-                                action.name
+                                action.name,
+                                action.x,
+                                action.y
                             ),
                             action.x,
                             action.y
@@ -93,7 +95,12 @@ class GameStateManager {
                         players.remove(it)
                     }
                 is MoveAction -> players.first { it.player.id == action.player }.apply {
-                    predictMovement(movementWeighting, action.x, action.y)
+                    predictMovement(
+                        movementWeighting,
+                        action.x,
+                        action.y,
+                        action.input
+                    )
                 }
             }
         }
