@@ -9,6 +9,8 @@ import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.MoveAction
 import uk.co.scarfebread.wizardbeast.game.actor.OtherPlayerSprite
 
 class GameStateManager {
+    var isReady = false
+
     lateinit var player: Player
     val players = mutableListOf<OtherPlayerSprite>()
     private val enemies = mutableListOf<String>()
@@ -16,12 +18,8 @@ class GameStateManager {
 
     private val buffer = mutableMapOf<Long, PublishableState>()
 
-    var nextStateAt = System.currentTimeMillis()
-    var lastPulledState = 0L
     private var lastStateProcessed = 0L
     private var latestState = 0L
-
-    fun players() = players.toList()
 
     fun processServerState(publishableState: PublishableState) {
         player.x = publishableState.player.x
@@ -61,12 +59,15 @@ class GameStateManager {
             // and if we receive the actual state we want to re-run this code
             processPlayerState(nextStateId, movementWeighting)
         } else if (stateId > latestState) {
+            // TODO this means we're processing as we receive, which can lead to jank
+            // post on reddit to ask how you deal with this (variable buffer?)
             lastStateProcessed = processPlayerState(latestState, NO_MOVEMENT_WEIGHTING)
         }
     }
 
     fun playerRegistered(playerState: PlayerState) {
         player = playerState.toPlayer()
+        isReady = true
     }
 
     private fun processPlayerState(stateId: Long, movementWeighting: Long): Long {
@@ -105,8 +106,13 @@ class GameStateManager {
     }
 
     private fun MutableMap<Long, PublishableState>.prune(stateId: Long) {
-        entries.removeIf {
-            it.key < stateId - BUFFER_LIMIT
+        runCatching {
+            entries.removeIf {
+                it.key < stateId - BUFFER_LIMIT
+            }
+        }.onFailure {
+            // TODO avoid this concurrency problem
+            it.printStackTrace()
         }
     }
 
@@ -133,7 +139,7 @@ class GameStateManager {
     }
 
     private fun getNextState(stateId: Long): Long {
-        for (i in stateId + 1 .. buffer.keys.max()) {
+        for (i in stateId + 1 .. latestState) {
             if (buffer[i] != null) {
                 return i
             }

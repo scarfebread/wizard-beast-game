@@ -51,12 +51,14 @@ class BackendClient(
             when(eventType) {
                 "state" -> {
                     withLag {
-                        // TODO reject if client has crashed
-                        gameStateManager.processServerState(
-                            payload.deserialise<PublishableState>().also {
+                        payload.deserialise<PublishableState>().let {
+                            if (gameStateManager.isReady) {
+                                gameStateManager.processServerState(it)
                                 acknowledge(it.player.id, it.stateId, requestId)
+                            } else {
+                                deregisterPlayer(it.player.id)
                             }
-                        )
+                        }
                     }
                 }
                 "registered" -> {
