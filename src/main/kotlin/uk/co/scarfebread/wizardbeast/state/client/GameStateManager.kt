@@ -43,15 +43,13 @@ class GameStateManager {
 
         val stateId = currentStateId() - BUFFER
 
-        if (stateId == lastStateProcessed || stateId > latestState) {
+        if (stateId == lastStateProcessed) {
             return
         }
 
         if (buffer[stateId] != null) {
-            processPlayerState(stateId, NO_MOVEMENT_WEIGHTING)
-
-            lastStateProcessed = stateId
-        } else {
+            lastStateProcessed = processPlayerState(stateId, NO_MOVEMENT_WEIGHTING)
+        } else if (stateId < latestState) {
             val nextStateId = getNextState(stateId)
 
             val distanceToPreviousState = stateId - lastStateProcessed
@@ -59,7 +57,11 @@ class GameStateManager {
             val range = distanceToPreviousState + distanceToNextState
             val movementWeighting = distanceToPreviousState / range
 
+            // we do not assign lastStateProcessed as it's a prediction
+            // and if we receive the actual state we want to re-run this code
             processPlayerState(nextStateId, movementWeighting)
+        } else if (stateId > latestState) {
+            lastStateProcessed = processPlayerState(latestState, NO_MOVEMENT_WEIGHTING)
         }
     }
 
@@ -67,32 +69,39 @@ class GameStateManager {
         player = playerState.toPlayer()
     }
 
-    private fun processPlayerState(stateId: Long, movementWeighting: Long) {
+    private fun processPlayerState(stateId: Long, movementWeighting: Long): Long {
         buffer[stateId]!!.players.forEach { action ->
             when (action) {
-                is ConnectAction -> players.add(
-                    OtherPlayerSprite(
-                        PlayerState(
-                            action.id,
-                            action.name
-                        ),
-                        action.x,
-                        action.y
+                is ConnectAction -> {
+                    println("ConnectAction")
+                    players.add(
+                        OtherPlayerSprite(
+                            PlayerState(
+                                action.id,
+                                action.name
+                            ),
+                            action.x,
+                            action.y
+                        )
                     )
-                )
+                }
                 is DisconnectAction -> {
+                    println("DisconnectAction")
                     players.firstOrNull { it.name == action.name }?.let { // TODO should be ID
                         it.disconnected = true
                         players.remove(it)
                     }
                 }
                 is MoveAction -> {
+                    println("MoveAction")
                     players.first { it.name == action.name }.apply {
                         predictMovement(movementWeighting, action.x, action.y)
                     }
                 }
             }
         }
+
+        return stateId
     }
 
     private fun MutableMap<Long, PublishableState>.prune(stateId: Long) {

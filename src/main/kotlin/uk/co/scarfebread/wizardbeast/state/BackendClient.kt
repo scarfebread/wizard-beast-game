@@ -45,12 +45,13 @@ class BackendClient(
             val payload = split.second()
             val requestId = split.last()
 
-//            if (eventType != "state")
+            if (eventType != "state")
                 println(message)
 
             when(eventType) {
                 "state" -> {
                     withLag {
+                        // TODO reject if client has crashed
                         gameStateManager.processServerState(
                             payload.deserialise<PublishableState>().also {
                                 acknowledge(it.player.id, it.stateId, requestId)
@@ -160,7 +161,7 @@ class BackendClient(
     @OptIn(DelicateCoroutinesApi::class)
     private fun withLag(process: () -> Unit) = runBlocking {
         GlobalScope.launch(Dispatchers.IO) {
-            delay(100)
+            delay((10..100).random().toLong())
             process()
         }
     }
