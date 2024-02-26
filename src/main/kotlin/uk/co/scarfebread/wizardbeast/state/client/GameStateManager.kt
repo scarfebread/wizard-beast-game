@@ -6,13 +6,13 @@ import uk.co.scarfebread.wizardbeast.state.publishable.PublishableState
 import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.ConnectAction
 import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.DisconnectAction
 import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.MoveAction
-import uk.co.scarfebread.wizardbeast.game.actor.OtherPlayerSprite
+import uk.co.scarfebread.wizardbeast.game.actor.ServerControlledWizard
 
 class GameStateManager {
     var isReady = false
 
     lateinit var player: Player
-    val players = mutableListOf<OtherPlayerSprite>()
+    val players = mutableListOf<ServerControlledWizard>()
     private val enemies = mutableListOf<String>()
     private val projectiles = mutableListOf<String>()
 
@@ -61,6 +61,7 @@ class GameStateManager {
         } else if (stateId > latestState) {
             // TODO this means we're processing as we receive, which can lead to jank
             // post on reddit to ask how you deal with this (variable buffer?)
+            // client side prediction?
             lastStateProcessed = processPlayerState(latestState, NO_MOVEMENT_WEIGHTING)
         }
     }
@@ -75,7 +76,7 @@ class GameStateManager {
             when (action) {
                 is ConnectAction -> if (players.firstOrNull { it.player.id == action.id } == null) {
                     players.add(
-                        OtherPlayerSprite(
+                        ServerControlledWizard(
                             PlayerState(
                                 action.id,
                                 action.name

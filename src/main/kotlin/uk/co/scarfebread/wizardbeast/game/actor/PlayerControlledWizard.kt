@@ -4,26 +4,25 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.scenes.scene2d.Actor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import uk.co.scarfebread.wizardbeast.model.Player
 import uk.co.scarfebread.wizardbeast.state.BackendClient
 
-class PlayerSprite(
+class PlayerControlledWizard(
     private val backendClient: BackendClient,
     private val player: Player,
     private var x: Float,
     private var y: Float,
-) : Actor() {
+) : WizardSprite() {
     override fun draw(batch: Batch, parentAlpha: Float) = runBlocking {
         batch.draw(
-            Texture(Gdx.files.internal("src/main/resources/assets/bucket.png")),
+            Texture(texture),
             x,
             y,
-            25f,
-            25f
+            SIZE,
+            SIZE
         )
 
         animate()

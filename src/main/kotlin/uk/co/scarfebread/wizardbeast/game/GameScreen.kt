@@ -6,11 +6,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.ScreenUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import uk.co.scarfebread.wizardbeast.game.actor.OtherPlayerSprite
-import uk.co.scarfebread.wizardbeast.game.actor.PlayerSprite
+import uk.co.scarfebread.wizardbeast.game.actor.PlayerControlledWizard
 import uk.co.scarfebread.wizardbeast.state.BackendClient
 import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
 
@@ -20,7 +16,7 @@ class GameScreen(
     private val gameStateManager: GameStateManager
 ) : Screen {
     private var camera: OrthographicCamera = OrthographicCamera()
-    private var playerSprite: PlayerSprite = PlayerSprite(
+    private var playerControlledWizard: PlayerControlledWizard = PlayerControlledWizard(
         backendClient,
         gameStateManager.player,
         gameStateManager.player.x,
@@ -30,7 +26,7 @@ class GameScreen(
     init {
         camera.setToOrtho(false, 800f, 480f)
 
-        stage.addActor(playerSprite)
+        stage.addActor(playerControlledWizard)
         gameStateManager.players.forEach {
             stage.addActor(it)
         }

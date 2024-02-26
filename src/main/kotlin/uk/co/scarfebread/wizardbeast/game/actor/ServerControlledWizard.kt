@@ -1,12 +1,10 @@
 package uk.co.scarfebread.wizardbeast.game.actor
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.scenes.scene2d.Actor
 import uk.co.scarfebread.wizardbeast.state.publishable.PlayerState
 
-class OtherPlayerSprite(
+class ServerControlledWizard(
     val player: PlayerState,
     private var x: Float,
     private var y: Float,
@@ -14,18 +12,19 @@ class OtherPlayerSprite(
     private var previousY: Float = y,
     var connected: Boolean = true,
     var disconnected: Boolean = false,
-) : Actor() {
+) : WizardSprite() {
     override fun draw(batch: Batch, parentAlpha: Float) {
         if (disconnected) {
             remove()
+            return
         }
 
         batch.draw(
-            Texture(Gdx.files.internal("src/main/resources/assets/bucket.png")),
+            Texture(texture),
             x,
             y,
-            25f,
-            25f
+            SIZE,
+            SIZE
         )
     }
 
