@@ -18,7 +18,8 @@ class GameStateManager {
 
     var nextStateAt = System.currentTimeMillis()
     var lastPulledState = 0L
-    private var lastState = 0L
+    private var lastStateProcessed = 0L
+    private var latestState = 0L
 
     fun players() = players.toList()
 
@@ -26,9 +27,13 @@ class GameStateManager {
         player.x = publishableState.player.x
         player.y = publishableState.player.y
 
-        buffer[publishableState.stateId] = publishableState
-
-        buffer.prune(publishableState.stateId)
+        publishableState.stateId.run {
+            buffer[this] = publishableState
+            if (this > latestState) {
+                latestState = this
+            }
+            buffer.prune(this)
+        }
     }
 
     fun processState() {
@@ -38,18 +43,18 @@ class GameStateManager {
 
         val stateId = currentStateId() - BUFFER
 
-        if (stateId == lastState || stateId > buffer.keys.last()) {
+        if (stateId == lastStateProcessed || stateId > latestState) {
             return
         }
 
         if (buffer[stateId] != null) {
             processPlayerState(stateId, NO_MOVEMENT_WEIGHTING)
 
-            lastState = stateId
+            lastStateProcessed = stateId
         } else {
             val nextStateId = getNextState(stateId)
 
-            val distanceToPreviousState = stateId - lastState
+            val distanceToPreviousState = stateId - lastStateProcessed
             val distanceToNextState = nextStateId - stateId
             val range = distanceToPreviousState + distanceToNextState
             val movementWeighting = distanceToPreviousState / range
@@ -91,16 +96,14 @@ class GameStateManager {
     }
 
     private fun MutableMap<Long, PublishableState>.prune(stateId: Long) {
-        if (size > BUFFER_LIMIT) {
-            for (i in keys.first() .. stateId - BUFFER_LIMIT) {
-                remove(i)
-            }
+        entries.removeIf {
+            it.key < stateId - BUFFER_LIMIT
         }
     }
 
     // TODO we need time synchronisation between client and server if we're doing this
     private fun currentStateId(): Long {
-        buffer.entries.maxBy { it.key }.value.let {
+        buffer[latestState]!!.let {
             val currentTimestamp = System.currentTimeMillis()
 
             var stateId = it.stateId
