@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
+import uk.co.scarfebread.wizardbeast.state.publishable.PlayerState
 
 class OtherPlayerSprite(
-    val id: String,
-    val name: String,
-    var x: Float,
-    var y: Float,
-    var previousX: Float = x,
-    var previousY: Float = y,
+    val player: PlayerState,
+    private var x: Float,
+    private var y: Float,
+    private var previousX: Float = x,
+    private var previousY: Float = y,
     var connected: Boolean = true,
     var disconnected: Boolean = false,
 ) : Actor() {
@@ -30,6 +30,8 @@ class OtherPlayerSprite(
     }
 
     fun predictMovement(movementWeighting: Long, x: Float, y: Float) {
+        previousX = this.x
+        previousY = this.y
         this.x = move(movementWeighting, this.x, x)
         this.y = move(movementWeighting, this.y, y)
     }

@@ -32,13 +32,13 @@ class GameStateManager {
     }
 
     fun processState() {
-        val stateId = currentStateId() - BUFFER
-
-        if (stateId == lastState) {
+        if (buffer.isEmpty()) {
             return
         }
 
-        if (buffer.isEmpty() || stateId > buffer.keys.last()) {
+        val stateId = currentStateId() - BUFFER
+
+        if (stateId == lastState || stateId > buffer.keys.last()) {
             return
         }
 
@@ -49,11 +49,10 @@ class GameStateManager {
         } else {
             val nextStateId = getNextState(stateId)
 
-            val xDifference = stateId - lastState
-            val yDifference = nextStateId - stateId
-
-            val range = xDifference + yDifference
-            val movementWeighting = xDifference / range
+            val distanceToPreviousState = stateId - lastState
+            val distanceToNextState = nextStateId - stateId
+            val range = distanceToPreviousState + distanceToNextState
+            val movementWeighting = distanceToPreviousState / range
 
             processPlayerState(nextStateId, movementWeighting)
         }
@@ -66,7 +65,16 @@ class GameStateManager {
     private fun processPlayerState(stateId: Long, movementWeighting: Long) {
         buffer[stateId]!!.players.forEach { action ->
             when (action) {
-                is ConnectAction -> players.add(OtherPlayerSprite(action.id, action.name, action.x, action.y))
+                is ConnectAction -> players.add(
+                    OtherPlayerSprite(
+                        PlayerState(
+                            action.id,
+                            action.name
+                        ),
+                        action.x,
+                        action.y
+                    )
+                )
                 is DisconnectAction -> {
                     players.firstOrNull { it.name == action.name }?.let { // TODO should be ID
                         it.disconnected = true
@@ -75,8 +83,6 @@ class GameStateManager {
                 }
                 is MoveAction -> {
                     players.first { it.name == action.name }.apply {
-                        previousX = x
-                        previousY = y
                         predictMovement(movementWeighting, action.x, action.y)
                     }
                 }

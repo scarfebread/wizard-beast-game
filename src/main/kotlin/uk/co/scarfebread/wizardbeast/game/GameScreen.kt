@@ -37,6 +37,8 @@ class GameScreen(
     }
 
     override fun render(delta: Float) {
+        gameStateManager.processState()
+
         gameStateManager.players.forEach {
             if (it.connected) {
                 it.connected = false

@@ -34,7 +34,7 @@ fun main(args: Array<String>) = runBlocking {
         client.listen()
     }
 
-    val game = WizardBeast(gameStateManager.players(), client, gameStateManager)
+    val game = WizardBeast(client, gameStateManager)
 
     runCatching {
         Lwjgl3Application(game, Lwjgl3ApplicationConfiguration().apply {

@@ -5,10 +5,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Stage
 import uk.co.scarfebread.wizardbeast.state.BackendClient
 import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
-import uk.co.scarfebread.wizardbeast.state.publishable.PlayerState
 
 class WizardBeast(
-    private val players: List<PlayerState>,
     private val backendClient: BackendClient,
     private val gameStateManager: GameStateManager
 ) : Game() {
