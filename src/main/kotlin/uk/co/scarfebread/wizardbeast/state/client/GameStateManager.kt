@@ -73,19 +73,16 @@ class GameStateManager {
     private fun processPlayerState(stateId: Long, movementWeighting: Long): Long {
         buffer[stateId]!!.players.forEach { action ->
             when (action) {
-                is ConnectAction -> {
-                    println("ConnectAction")
-                    players.add(
-                        OtherPlayerSprite(
-                            PlayerState(
-                                action.id,
-                                action.name
-                            ),
-                            action.x,
-                            action.y
-                        )
+                is ConnectAction -> players.add(
+                    OtherPlayerSprite(
+                        PlayerState(
+                            action.id,
+                            action.name
+                        ),
+                        action.x,
+                        action.y
                     )
-                }
+                )
                 is DisconnectAction -> {
                     println("DisconnectAction")
                     players.firstOrNull { it.name == action.name }?.let { // TODO should be ID
@@ -93,11 +90,8 @@ class GameStateManager {
                         players.remove(it)
                     }
                 }
-                is MoveAction -> {
-                    println("MoveAction")
-                    players.first { it.name == action.name }.apply {
-                        predictMovement(movementWeighting, action.x, action.y)
-                    }
+                is MoveAction -> players.first { it.player.id == action.player }.apply {
+                    predictMovement(movementWeighting, action.x, action.y)
                 }
             }
         }
@@ -151,6 +145,6 @@ class GameStateManager {
     companion object {
         private const val BUFFER = 5
         private const val BUFFER_LIMIT = 64
-        private const val NO_MOVEMENT_WEIGHTING = 0L
+        private const val NO_MOVEMENT_WEIGHTING = 1L
     }
 }
