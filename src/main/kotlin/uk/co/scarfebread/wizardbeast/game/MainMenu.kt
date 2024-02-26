@@ -69,7 +69,8 @@ class MainMenu(
                     backendClient.registerPlayer(username) {
                         runCatching {
                             gameStateManager.playerRegistered(it)
-                            game.screen = GameScreen(game, gameStateManager)
+                            game.screen.dispose()
+                            game.screen = GameScreen(game.stage, backendClient, gameStateManager)
                             dispose()
                         }.onFailure {
                             usernameError.setText(it.message)
@@ -103,7 +104,9 @@ class MainMenu(
     }
 
     override fun dispose() {
-
+        usernameLabel.remove()
+        usernameError.remove()
+        usernameTextField.remove()
     }
 
     private fun label(text: String, x: Float, y: Float) = Label(

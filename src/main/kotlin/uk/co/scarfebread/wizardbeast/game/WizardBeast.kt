@@ -18,7 +18,7 @@ class WizardBeast(
 ) : Game() {
     lateinit var stage: Stage
     lateinit var font: BitmapFont
-    private val registrationEnabled = false
+    private val registrationEnabled = true
 
     override fun create() {
         font = BitmapFont()
@@ -26,7 +26,7 @@ class WizardBeast(
         if (registrationEnabled) {
             this.setScreen(MainMenu(this, backendClient, gameStateManager))
         } else {
-            this.setScreen(GameScreen(this, gameStateManager))
+            this.setScreen(GameScreen(stage, backendClient, gameStateManager))
         }
     }
 
