@@ -162,7 +162,7 @@ class BackendClient(
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun withLag(process: () -> Unit) = runBlocking {
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.Unconfined) {
             delay((10..100).random().toLong())
             process()
         }
