@@ -31,10 +31,8 @@ class WizardBeast(
     }
 
     override fun dispose() {
-        getScreen().dispose()
-
+        screen.dispose()
         font.dispose()
-
         stage.dispose()
     }
 }

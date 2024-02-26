@@ -17,6 +17,9 @@ class GameStateManager {
     fun players() = players.toList()
 
     fun processServerState(publishableState: PublishableState) {
+        player.x = publishableState.player.x
+        player.y = publishableState.player.y
+
         publishableState.players.forEach { action ->
             when (action) {
                 is ConnectAction -> players.add(PlayerState(action.id, action.name, action.x, action.y))

@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AcknowledgeRequest(
-    val stateId: Long
+    val stateId: Long,
+    val player: String,
 ) : Request()

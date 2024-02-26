@@ -23,6 +23,8 @@ class PlayerSprite(
             25f
         )
 
+        animate()
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) { left() }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) { right() }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) { up() }
@@ -35,13 +37,18 @@ class PlayerSprite(
     private fun right() { x += SPEED }
 
     fun publish() {
+        // TODO I should only send 64 times a second
         if (x != player.x || y != player.y) {
-            backendClient.movePlayer(player)
+            backendClient.movePlayer(player.id, x, y)
         }
     }
 
     fun animate() {
-
+        if (x == player.x && y == player.y) {
+            println("player matches server")
+        } else {
+            println("player does not match the server")
+        }
     }
 
     companion object {

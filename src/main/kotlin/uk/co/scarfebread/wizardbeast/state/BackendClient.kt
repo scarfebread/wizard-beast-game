@@ -8,6 +8,7 @@ import io.ktor.utils.io.core.readUTF8Line
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import uk.co.scarfebread.wizardbeast.model.Player
+import uk.co.scarfebread.wizardbeast.model.request.AcknowledgeRequest
 import uk.co.scarfebread.wizardbeast.model.request.DeregisterRequest
 import uk.co.scarfebread.wizardbeast.model.request.PlayerActionRequest
 import uk.co.scarfebread.wizardbeast.model.request.PlayerActionRequest.Action
@@ -42,7 +43,11 @@ class BackendClient(
 
             when(eventType) {
                 "state" -> {
-                    gameStateManager.processServerState(payload.deserialise<PublishableState>())
+                    gameStateManager.processServerState(
+                        payload.deserialise<PublishableState>().also {
+                            acknowledge(it.player.id, it.stateId, requestId)
+                        }
+                    )
                 }
                 "registered" -> {
                     registrations[requestId]?.invoke(payload.deserialise<PlayerState>())
@@ -74,15 +79,16 @@ class BackendClient(
         }
     }
 
-    fun movePlayer(player: Player) {
+    fun movePlayer(player: String, x: Float, y: Float) {
         runBlocking {
             clientSocket.send(
                 createActionDataGram(
                     player,
                     listOf(
-                        Action("x", player.x.toString()),
-                        Action("y", player.y.toString()),
-                    )
+                        Action("x", x.toString()),
+                        Action("y", y.toString()),
+                    ),
+                    requestId()
                 )
             )
         }
@@ -103,12 +109,30 @@ class BackendClient(
         }
     }
 
-    private fun createActionDataGram(player: Player, actions: List<Action>) = Datagram(
+    private fun acknowledge(player: String, stateId: Long, requestId: String) {
+        runBlocking {
+            clientSocket.send(
+                Datagram(
+                    ByteReadPacket(
+                        AcknowledgeRequest(stateId, player)
+                            .toJson(json)
+                            .toRequest("acknowledge", requestId)
+                            .encodeToByteArray()
+                    ),
+                    server
+                )
+            )
+        }
+    }
+
+    private fun createActionDataGram(player: String, actions: List<Action>, requestId: String) = Datagram(
         ByteReadPacket(
             PlayerActionRequest(
-                player.id,
-                actions
-            ).toJson(json).encodeToByteArray()
+            player,
+            actions
+        ).toJson(json)
+            .toRequest("update", requestId)
+            .encodeToByteArray()
         ),
         server
     )

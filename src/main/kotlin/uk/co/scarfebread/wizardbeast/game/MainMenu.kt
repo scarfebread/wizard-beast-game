@@ -88,7 +88,7 @@ class MainMenu(
     }
 
     override fun resize(width: Int, height: Int) {
-        game.stage.viewport.update(width, height, true);
+        game.stage.viewport.update(width, height, true)
     }
 
     override fun pause() {
