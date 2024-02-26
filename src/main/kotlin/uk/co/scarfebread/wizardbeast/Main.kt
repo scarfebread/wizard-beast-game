@@ -15,7 +15,9 @@ import uk.co.scarfebread.wizardbeast.state.BackendClient
 import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
 import java.util.*
 
-fun main() =  runBlocking {
+fun main(args: Array<String>) = runBlocking {
+    val clientPort = args[0]
+
     val gameStateManager = GameStateManager()
 
     val server = InetSocketAddress("127.0.0.1", 9002)
@@ -23,7 +25,7 @@ fun main() =  runBlocking {
     val client = BackendClient(
         aSocket(SelectorManager(Dispatchers.IO))
             .udp()
-            .bind(InetSocketAddress("127.0.0.1", 9003)),
+            .bind(InetSocketAddress("127.0.0.1", clientPort.toInt())),
         server,
         gameStateManager
     )

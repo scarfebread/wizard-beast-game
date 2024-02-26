@@ -1,4 +1,4 @@
-package uk.co.scarfebread.wizardbeast.state.publishable.action
+package uk.co.scarfebread.wizardbeast.engine.state.publishable.action
 
 import kotlinx.serialization.Serializable
 

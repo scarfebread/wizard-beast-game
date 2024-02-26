@@ -3,13 +3,12 @@ package uk.co.scarfebread.wizardbeast.state.client
 import uk.co.scarfebread.wizardbeast.model.Player
 import uk.co.scarfebread.wizardbeast.state.publishable.PlayerState
 import uk.co.scarfebread.wizardbeast.state.publishable.PublishableState
-import uk.co.scarfebread.wizardbeast.state.publishable.action.ConnectAction
-import uk.co.scarfebread.wizardbeast.state.publishable.action.DisconnectAction
-import uk.co.scarfebread.wizardbeast.state.publishable.action.MoveAction
+import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.ConnectAction
+import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.DisconnectAction
+import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.MoveAction
 
 class GameStateManager {
     lateinit var player: Player
-//    var player = Player("", "", 100f, 100f)
     private val players = mutableListOf<PlayerState>()
     private val enemies = mutableListOf<String>()
     private val projectiles = mutableListOf<String>()

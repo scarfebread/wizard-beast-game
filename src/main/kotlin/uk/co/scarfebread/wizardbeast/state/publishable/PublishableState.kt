@@ -1,7 +1,7 @@
 package uk.co.scarfebread.wizardbeast.state.publishable
 
 import kotlinx.serialization.Serializable
-import uk.co.scarfebread.wizardbeast.state.publishable.action.PlayerAction
+import uk.co.scarfebread.wizardbeast.engine.state.publishable.action.PlayerAction
 
 @Serializable
 data class PublishableState(
