@@ -7,5 +7,5 @@ data class Player(
     val id: String,
     val name: String,
     var x: Float,
-    var y: Float
+    var y: Float,
 )

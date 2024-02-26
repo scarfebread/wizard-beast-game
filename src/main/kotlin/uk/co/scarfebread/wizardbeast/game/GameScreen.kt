@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ScreenUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import uk.co.scarfebread.wizardbeast.game.actor.OtherPlayerSprite
 import uk.co.scarfebread.wizardbeast.game.actor.PlayerSprite
 import uk.co.scarfebread.wizardbeast.state.BackendClient
 import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
@@ -16,7 +17,7 @@ import uk.co.scarfebread.wizardbeast.state.client.GameStateManager
 class GameScreen(
     private val stage: Stage,
     backendClient: BackendClient,
-    gameStateManager: GameStateManager
+    private val gameStateManager: GameStateManager
 ) : Screen {
     private var camera: OrthographicCamera = OrthographicCamera()
     private var playerSprite: PlayerSprite = PlayerSprite(
@@ -30,9 +31,19 @@ class GameScreen(
         camera.setToOrtho(false, 800f, 480f)
 
         stage.addActor(playerSprite)
+        gameStateManager.players.forEach {
+            stage.addActor(it)
+        }
     }
 
     override fun render(delta: Float) {
+        gameStateManager.players.forEach {
+            if (it.connected) {
+                it.connected = false
+                stage.addActor(it)
+            }
+        }
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         ScreenUtils.clear(0f, 0f, 0.2f, 1f)
