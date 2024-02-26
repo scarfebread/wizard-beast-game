@@ -73,16 +73,18 @@ class GameStateManager {
     private fun processPlayerState(stateId: Long, movementWeighting: Long): Long {
         buffer[stateId]!!.players.forEach { action ->
             when (action) {
-                is ConnectAction -> players.add(
-                    OtherPlayerSprite(
-                        PlayerState(
-                            action.id,
-                            action.name
-                        ),
-                        action.x,
-                        action.y
+                is ConnectAction -> if (players.firstOrNull { it.player.id == action.id } == null) {
+                    players.add(
+                        OtherPlayerSprite(
+                            PlayerState(
+                                action.id,
+                                action.name
+                            ),
+                            action.x,
+                            action.y
+                        )
                     )
-                )
+                }
                 is DisconnectAction -> players
                     .firstOrNull { it.player.id == action.player }
                     ?.let {
