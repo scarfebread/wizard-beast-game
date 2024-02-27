@@ -20,6 +20,7 @@ class PlayerInputListener(private val wizard: PlayerControlledWizard) : InputLis
 
     private fun processKeyAction(keycode: Int, currentlyPressed: Boolean) {
         actions[keycode] = currentlyPressed
+        wizard.inputsSinceState.add(keycode)
 
         when(keycode) {
             Input.Keys.LEFT -> {

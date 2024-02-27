@@ -24,6 +24,8 @@ class GameStateManager {
     fun processServerState(publishableState: PublishableState) {
         player.x = publishableState.player.x
         player.y = publishableState.player.y
+        player.lastState = publishableState.timestamp
+        player.wizard?.synchroniseLocation()
 
         publishableState.stateId.run {
             buffer[this] = publishableState

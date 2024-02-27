@@ -21,6 +21,7 @@ class ServerControlledWizard(
             return
         }
 
+        synchroniseLocation()
         animate()
 
         batch.draw(
@@ -30,6 +31,27 @@ class ServerControlledWizard(
             SIZE,
             SIZE
         )
+    }
+
+    private fun synchroniseLocation() {
+        val xDiff = player.x - location.x
+        val yDiff = player.y - location.y
+
+        if (
+            !input.left &&
+            !input.right &&
+            xDiff != 0f
+        ) {
+            synchroniseX(xDiff)
+        }
+
+        if (
+            !input.up &&
+            !input.down &&
+            yDiff != 0f
+        ) {
+            synchroniseY(yDiff)
+        }
     }
 
     fun predictMovement(movementWeighting: Long, x: Float, y: Float, input: Input) {

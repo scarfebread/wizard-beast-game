@@ -1,12 +1,12 @@
 package uk.co.scarfebread.wizardbeast.model
 
-import kotlinx.serialization.Serializable
+import uk.co.scarfebread.wizardbeast.game.actor.PlayerControlledWizard
 
-// TODO what's the point of this class vs PlayerState
-@Serializable
 data class Player(
     val id: String,
     val name: String,
     var x: Float,
     var y: Float,
+    var lastState: Long = 0L,
+    var wizard: PlayerControlledWizard? = null
 )

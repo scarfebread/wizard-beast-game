@@ -35,6 +35,23 @@ sealed class WizardSprite(val player: Player, protected var location: Location) 
         this.right = input.right
     }
 
+    protected fun synchroniseX(diff: Float) = run { location.x += synchroniseLocation(diff) }
+
+    protected fun synchroniseY(diff: Float) = run { location.y += synchroniseLocation(diff) }
+
+    private fun synchroniseLocation(diff: Float): Float {
+        // TODO this mainly fixes the problem but there's a slight jank to it visually
+        // maybe it should do speed * delta time? we'd just need to make sure it doesn't overshoot
+        (diff * Gdx.graphics.deltaTime).let { speed ->
+            // TODO I think if we fixed the above TODO we wouldn't need this
+            return if (speed > 0.1f || speed < -0.1f) {
+                speed
+            } else {
+                0f
+            }
+        }
+    }
+
     companion object {
         internal const val SIZE = 25f
         internal const val SPEED = 100f
